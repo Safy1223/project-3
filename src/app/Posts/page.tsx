@@ -40,8 +40,6 @@ export default async function PostsPage() {
           </div>
         </Link>
       ))}
-
-      <div>{/* <Todo /> */}</div>
     </>
   );
 }
