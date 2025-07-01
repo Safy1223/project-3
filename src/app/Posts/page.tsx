@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Todo from "../components/Todo";
+//import Todo from "../components/Todo";
 export default async function PostsPage() {
   //لما تكون البيانات تتغير كل فترة //ISR – خزّن مؤقتًا //next: { revalidate: 60 }
   const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
