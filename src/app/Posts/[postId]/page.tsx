@@ -6,13 +6,13 @@ type PageProps = {
   };
 };
 
-const Page = ({ params }: PageProps) => {
+const Page = async (props: PageProps) => {
   const loadingJsx = (
     <div>
       <h1>Loading....</h1>
     </div>
   );
-  const postId = params.postId;
+  const { postId } = props.params;
   return (
     <>
       <h1>Post Details</h1>
