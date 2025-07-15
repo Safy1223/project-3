@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Providers from "@/components/Providers"; // <--- أضف هذا السطر لاستيراد مكون Providers الجديد
+import Navbar from "@/components/Navbar";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +30,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          <Navbar /> {/* <--- إضافة شريط التنقل هنا */}
+          <main className="min-h-screen">
+            {" "}
+            {/* يمكنك إضافة تنسيقات للمحتوى الرئيسي */}
+            {children}
+            <Toaster position="bottom-center" /> {/* <--- 2. أضف المكون هنا */}
+          </main>
+        </Providers>
       </body>
     </html>
   );
