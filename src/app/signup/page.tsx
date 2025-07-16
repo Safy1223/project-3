@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, User, Mail, Lock, PenSquare } from "lucide-react";
+import { Loader2, PenSquare } from "lucide-react";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -45,8 +45,9 @@ export default function SignUpPage() {
 
         toast.success("Registration successful! Please sign in.");
         router.push("/login");
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        const err = error as Error;
+        toast.error(err.message);
       }
     });
   };
