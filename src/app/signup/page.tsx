@@ -1,107 +1,154 @@
+// app/signup/page.tsx
 "use client";
-import { InputWithIcon } from "@/components/IconWithInput";
-import { Button } from "@/components/ui/button";
+
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import toast from "react-hot-toast";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, User, Mail, Lock, PenSquare } from "lucide-react";
 
 export default function SignUpPage() {
-  const [username, setUsername] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, startSubmitting] = useTransition();
   const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("Registration successful! Please log in.");
-        router.push("/login");
-      } else {
-        setError(data.message || "Registration failed. Please try again.");
-      }
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-      // هذا الكود يُنفّذ دائماً
+    if (!username || !email || !password) {
+      toast.error("All fields are required.");
+      return;
     }
-  }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+
+    startSubmitting(async () => {
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Registration failed.");
+        }
+
+        toast.success("Registration successful! Please sign in.");
+        router.push("/login");
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    });
+  };
+
   return (
-    <div className="flex h-screen">
-      {/* Left Side */}
-      <div className="relative flex-1/2 bg-gradient-to-br from-blue-700 to-blue-500 text-white p-4 flex-col flex items-center justify-center">
-        <img
-          src="/icon/Group.svg"
-          alt="Background shape"
-          className="absolute bottom-0 left-0   z-0 border-none"
-        />
+    <div className="flex min-h-screen">
+      {/* --- القسم الأيمن: النموذج --- */}
+      <div className="flex flex-1 flex-col justify-center items-center p-8">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-block mb-4">
+              <PenSquare className="h-10 w-10 text-blue-600" />
+            </Link>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Create an Account
+            </h1>
+            <p className="text-gray-500 mt-2">
+              Start your writing journey today.
+            </p>
+          </div>
 
-        <h2 className=" text-3xl  font-bold mb-4 mt-7">GoFinance</h2>
-        <p className="mb-6">The most popular peer to peer lending at SEA</p>
-        <Link href="/login">
-          <Button
-            className="bg-[#5CA9F8] rounded-md hover:bg-white/20 transition cursor-pointer "
-            variant="outline"
-          >
-            Login
-          </Button>
-        </Link>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="John Doe"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full !mt-6"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-gray-600 mt-8">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-blue-600 hover:underline"
+            >
+              Sign In
+            </Link>
+          </p>
+        </div>
       </div>
-      {/* Right Side */}
-      <div className="bg-[#EEEEEE] flex-1/3 flex justify-center items-center flex-col  ">
-        <h1 className="text-2xl font-bold">Hello Again!</h1>
-        <p className="mt-6">Welcome Back</p>
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center w-full max-w-xs"
-        >
-          <InputWithIcon
-            icon={User}
-            placeholder="Full Name"
-            type="Text"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <InputWithIcon
-            icon={Mail}
-            placeholder="Email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
 
-          <InputWithIcon
-            icon={Lock}
-            placeholder="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <Button
-            type="submit"
-            className="bg-[#5CA9F8] rounded-md hover:bg-white/20 transition cursor-pointer  w-1/3"
-            variant="outline"
-            disabled={loading || !username || !email || !password} // تعطيل الزر
-          >
-            {loading ? "Signing Up..." : "Sign Up"}
-          </Button>
-        </form>
+      {/* --- القسم الأيسر: الصورة (يختفي على الموبايل) --- */}
+      <div className="hidden lg:flex flex-1 relative items-center justify-center">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/login-bg.jpg')" }} // استخدام نفس الصورة
+        ></div>
+        <div className="absolute inset-0 bg-blue-800 opacity-70"></div>
+        <div className="relative z-10 text-white text-center p-12 max-w-lg">
+          <h2 className="text-4xl font-bold leading-tight">
+            Share Your Voice.
+          </h2>
+          <p className="mt-4 text-lg text-blue-200">
+            Become part of a growing community of writers and thinkers. Your
+            story is waiting to be told.
+          </p>
+        </div>
       </div>
     </div>
   );

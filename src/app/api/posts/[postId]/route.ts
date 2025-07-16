@@ -19,17 +19,14 @@ export async function GET(request: Request, { params }: Props) {
   try {
     await connectDB();
 
-    // استخدم .lean() للحصول على كائن بسيط
     const post = await Post.findById(resolvedParams.postId).lean();
 
     if (!post) {
       return NextResponse.json({ message: "Post not found" }, { status: 404 });
     }
 
-    // أرجع بيانات المنشور كـ JSON
     return NextResponse.json(post, { status: 200 });
   } catch (error) {
-    // معالجة الأخطاء المحتملة (مثل ID غير صالح)
     console.error("Error fetching post:", error);
     return NextResponse.json(
       { message: "An internal server error occurred" },

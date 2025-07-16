@@ -1,50 +1,66 @@
 import connectDB from "@/lib/mongo";
 import Post from "@/models/Post";
-import { getServerSession } from "next-auth/next"; // استيراد getServerSession
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // استيراد authOptions
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
-import slugify from "slugify"; // <--- استيراد slugify
-
+import slugify from "slugify";
+import { revalidatePath } from "next/cache";
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
-    // إذا لم يكن هناك جلسة، أعد استجابة خطأ 401 Unauthorized
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  await connectDB();
-  const userId = session.user.id; // <--- معرف المستخدم من الجلسة
-  const { title, content, category } = await request.json();
-  if (!title || !content || !category) {
+  try {
+    const { title, content, category } = await request.json();
+    if (!title || !content || !category) {
+      return NextResponse.json(
+        { message: "Title, content, and category are required" },
+        { status: 400 }
+      );
+    }
+    await connectDB();
+    // إنشاء الـ slug من العنوان
+    const baseSlug = slugify(title, {
+      lower: true, // تحويل إلى أحرف صغيرة
+      strict: true, // إزالة الأحرف غير المدعومة
+      locale: "ar", // دعم اللغة العربية إذا كان العنوان بالعربية
+      trim: true,
+    });
+
+    // التحقق من وجود slug مكرر (للتأكد من التفرد)
+    let finalSlug = baseSlug;
+    let counter = 1;
+    while (await Post.findOne({ slug: finalSlug })) {
+      finalSlug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    const newPost = new Post({
+      title,
+      content,
+      author: session.user.id,
+      slug: finalSlug,
+      category,
+    });
+    await newPost.save();
+    revalidatePath("/dashboard/posts");
+    revalidatePath("/");
+    return NextResponse.json({ newPost }, { status: 201 });
+  } catch (error) {
+    // هذا يعالج حالة خاصة إذا حاول المستخدم إنشاء منشور بعنوان موجود بالفعل
+    if (error instanceof Error && error.message.includes("duplicate key")) {
+      return NextResponse.json(
+        { message: "A post with this title already exists." },
+        { status: 409 }
+      ); // 409 Conflict
+    }
     return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
+      { message: "An internal server error occurred" },
+      { status: 500 }
     );
   }
-  // إنشاء الـ slug من العنوان
-  const newSlug = slugify(title, {
-    lower: true, // تحويل إلى أحرف صغيرة
-    strict: true, // إزالة الأحرف غير المدعومة
-    locale: "ar", // دعم اللغة العربية إذا كان العنوان بالعربية
-  });
-
-  // التحقق من وجود slug مكرر (للتأكد من التفرد)
-  let finalSlug = newSlug;
-  let counter = 1;
-  while (await Post.findOne({ slug: finalSlug })) {
-    finalSlug = `${newSlug}-${counter}`;
-    counter++;
-  }
-
-  const newPost = new Post({
-    title,
-    content,
-    author: userId,
-    slug: finalSlug,
-    category,
-  });
-  await newPost.save();
-  return NextResponse.json({ newPost }, { status: 201 });
 }
+
 //اختبار الإتصال
 export async function GET() {
   try {
