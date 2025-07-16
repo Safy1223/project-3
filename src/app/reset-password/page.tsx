@@ -1,7 +1,7 @@
 // app/reset-password/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react"; // <-- 1. استيراد Suspense
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -21,8 +21,10 @@ import {
   ExclamationTriangleIcon,
   CheckCircledIcon,
 } from "@radix-ui/react-icons";
+import { Loader2 } from "lucide-react";
 
-export default function ResetPasswordPage() {
+// --- 2. إنشاء مكون داخلي جديد يحتوي على كل المنطق ---
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [token, setToken] = useState<string | null>(null);
@@ -33,12 +35,11 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    // استخراج الرمز المميز من عنوان URL
     const urlToken = searchParams.get("token");
     if (urlToken) {
       setToken(urlToken);
     } else {
-      setError("Password reset token is missing.");
+      setError("Password reset token is missing or invalid.");
     }
   }, [searchParams]);
 
@@ -61,7 +62,6 @@ export default function ResetPasswordPage() {
     }
 
     if (newPassword.length < 6) {
-      // يمكنك إضافة شروط أخرى لقوة كلمة المرور
       setError("Password must be at least 6 characters long.");
       setLoading(false);
       return;
@@ -78,94 +78,101 @@ export default function ResetPasswordPage() {
 
       if (res.ok) {
         setSuccess(
-          data.message ||
-            "Your password has been reset successfully. You can now log in."
+          data.message || "Your password has been reset successfully."
         );
-        // يمكنك إعادة التوجيه إلى صفحة تسجيل الدخول بعد فترة قصيرة
-
         setTimeout(() => {
           router.push("/login");
-        }, 2000);
+        }, 3000);
       } else {
-        setError(data.message || "Failed to reset password. Please try again.");
+        setError(data.message || "Failed to reset password.");
       }
-    } catch (err) {
-      console.error("Reset password request error:", err);
-      setError("An unexpected error occurred. Please try again.");
+    } catch {
+      setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
+  // --- هذا هو كود JSX الخاص بك، تم نقله إلى هنا ---
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-[380px]">
-        <CardHeader>
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
-          <CardDescription>Enter your new password below.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/*يتم عرض الكود داخل الأقواس null , undefined  موجود اي ليست error اذا كانت قيمة */}
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <ExclamationTriangleIcon className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {success && (
-            <Alert
-              variant="default"
-              className="mb-4 bg-green-100 border-green-400 text-green-700"
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="text-2xl">Reset Password</CardTitle>
+        <CardDescription>Enter your new password below.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <ExclamationTriangleIcon className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {success && (
+          <Alert className="mb-4 bg-green-100 border-green-400 text-green-700">
+            <CheckCircledIcon className="h-4 w-4" />
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* عرض النموذج فقط إذا لم يكن هناك نجاح */}
+        {!success && (
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={loading || !token}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading || !token}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading || !token}
             >
-              <CheckCircledIcon className="h-4 w-4" />
-              <AlertTitle>Success</AlertTitle>
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
-          )}
-          {!token &&
-            !error && ( // عرض رسالة تحميل أو انتظار إذا لم يتم العثور على الرمز بعد
-              <Alert className="mb-4">
-                <AlertTitle>Loading...</AlertTitle>
-                <AlertDescription>
-                  Checking password reset token.
-                </AlertDescription>
-              </Alert>
-            )}
-          {token && ( // عرض النموذج فقط إذا كان الرمز المميز موجودًا
-            <form onSubmit={handleSubmit} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Resetting..." : "Reset Password"}
-              </Button>
-            </form>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between text-sm">
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Back to Sign In
-          </Link>
-        </CardFooter>
-      </Card>
+              {loading ? "Resetting..." : "Reset Password"}
+            </Button>
+          </form>
+        )}
+      </CardContent>
+      <CardFooter className="flex justify-center text-sm">
+        <Link href="/login" className="text-blue-600 hover:underline">
+          Back to Sign In
+        </Link>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500 mb-4" />
+            <p className="text-gray-600">Loading Page...</p>
+          </div>
+        }
+      >
+        <ResetPasswordForm />
+      </Suspense>
     </div>
   );
 }
