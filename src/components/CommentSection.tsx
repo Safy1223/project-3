@@ -124,7 +124,9 @@ export default function CommentSection({
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4">Comments ({comments.length})</h2>
-
+      {isDeleting && (
+        <div className="text-sm text-gray-500 mb-2">Deleting comment...</div>
+      )}
       {/* نموذج إضافة تعليق */}
       {session ? ( // استخدم الجلسة التي تم تمريرها من Server Component لتحديد ما إذا كان المستخدم مسجلاً للدخول
         <form onSubmit={handleAddComment} className="mb-6 ">
