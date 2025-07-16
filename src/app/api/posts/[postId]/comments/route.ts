@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongo";
 import Comment from "@/models/Comment";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // تأكد من المسار الصحيح لـ authOptions
+import { authOptions } from "@/lib/authOptions";
 import Post from "@/models/Post";
 
 type Props = {

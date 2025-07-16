@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongo";
 import Post from "@/models/Post";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next"; // استيراد getServerSession
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // استيراد authOptions
+import { authOptions } from "@/lib/authOptions";
 
 type Props = {
   params: Promise<{

@@ -1,4 +1,4 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import CommentSection from "@/components/CommentSection";
 import LikeButton from "@/components/LikeButton";
 import connectDB from "@/lib/mongo";
