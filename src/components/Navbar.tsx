@@ -15,20 +15,30 @@ export default function Navbar() {
     <header className="border-b bg-white">
       <div className="   flex items-center justify-between p-4 flex-wrap  ">
         {/* --- الجزء الأيسر: الشعار والروابط --- */}
-        <div className="flex flex-1 sm:flex-none space-x-6 mb-4 md:mb-0 ">
+        <div className="flex flex-1 xl:flex-none space-x-6 mb-4 md:mb-0 ">
           <Link href="/" className=" text-2xl font-bold text-gray-900">
             MyBlog
           </Link>
-          <nav className="flex flex-1/2 justify-end  md:flex items-center space-x-4">
+          <nav className="flex flex-1/2 justify-end  sm:flex items-center space-x-4">
             <Link href="/" className=" text-gray-600 hover:text-gray-900">
               Home
             </Link>
+            {status === "authenticated" && session.user.role !== "admin" ? (
+              <Link
+                href="/dashboard/categories"
+                className=" text-gray-600 hover:text-gray-900"
+              >
+                Categories
+              </Link>
+            ) : (
+              false
+            )}
           </nav>
         </div>
 
         {/* --- الجزء الأيمن: البحث والمصادقة --- */}
-        <div className=" sm:flex items-center space-x-4 w-full md:w-auto">
-          <div className="flex-grow flex justify-center sm:flex-none">
+        <div className=" sm:flex items-center space-x-4 w-full md:mt-1">
+          <div className="flex-grow flex justify-center md:justify-between xl:flex-none">
             <SearchInput />
           </div>
 
