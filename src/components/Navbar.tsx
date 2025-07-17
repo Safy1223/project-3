@@ -13,22 +13,22 @@ export default function Navbar() {
   return (
     // --- تعديل: تصميم بسيط بخلفية بيضاء وحدود ---
     <header className="border-b bg-white">
-      <div className="container mx-auto flex items-center justify-between p-4 flex-wrap">
+      <div className="   flex items-center justify-between p-4 flex-wrap  ">
         {/* --- الجزء الأيسر: الشعار والروابط --- */}
-        <div className="flex items-center space-x-6 mb-4 md:mb-0">
-          <Link href="/" className="text-2xl font-bold text-gray-900">
+        <div className="flex flex-1 sm:flex-none space-x-6 mb-4 md:mb-0 ">
+          <Link href="/" className=" text-2xl font-bold text-gray-900">
             MyBlog
           </Link>
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
+          <nav className="flex flex-1/2 justify-end  md:flex items-center space-x-4">
+            <Link href="/" className=" text-gray-600 hover:text-gray-900">
               Home
             </Link>
           </nav>
         </div>
 
         {/* --- الجزء الأيمن: البحث والمصادقة --- */}
-        <div className="flex items-center space-x-4 w-full md:w-auto">
-          <div className="flex-grow">
+        <div className=" sm:flex items-center space-x-4 w-full md:w-auto">
+          <div className="flex-grow flex justify-center sm:flex-none">
             <SearchInput />
           </div>
 
@@ -36,8 +36,8 @@ export default function Navbar() {
           {status === "loading" ? (
             <Skeleton className="h-9 w-24 rounded-md" />
           ) : status === "authenticated" ? (
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-700 hidden lg:inline">
+            <div className="mt-2 flex md:flex items-center space-x-3">
+              <span className="flex-2 text-sm text-gray-700">
                 Welcome, {session.user?.name?.split(" ")[0]}!
               </span>
               <Link href="/dashboard/posts">
