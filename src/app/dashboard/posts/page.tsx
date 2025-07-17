@@ -106,7 +106,7 @@ const DashboardPostsPage = async ({ searchParams }: HomePageProps) => {
                   <Link href={`/dashboard/postsSlug/${post.slug}`}>
                     <Button
                       variant="secondary"
-                      size="lg"
+                      size="sm"
                       className="  cursor-pointer "
                     >
                       View Details
