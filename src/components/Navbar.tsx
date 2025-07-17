@@ -1,4 +1,3 @@
-// components/Navbar.tsx
 "use client";
 
 import Link from "next/link";
@@ -11,43 +10,45 @@ export default function Navbar() {
   const { data: session, status } = useSession();
 
   return (
-    // --- تعديل: تصميم بسيط بخلفية بيضاء وحدود ---
     <header className="border-b bg-white">
-      <div className="   flex items-center justify-between p-4 flex-wrap  ">
-        {/* --- الجزء الأيسر: الشعار والروابط --- */}
-        <div className="flex flex-1 xl:flex-none space-x-6 mb-4 md:mb-0 ">
-          <Link href="/" className=" text-2xl font-bold text-gray-900">
+      <div className="container mx-auto flex flex-col md:flex-row md:items-center md:justify-between p-4 gap-4">
+        {/* --- Left section: Logo and nav links --- */}
+        <div className="flex  sm:flex-row sm:items-center gap-4 md:gap-6">
+          <Link href="/" className="text-2xl font-bold text-gray-900">
             MyBlog
           </Link>
-          <nav className="flex flex-1/2 justify-end  sm:flex items-center space-x-4">
-            <Link href="/" className=" text-gray-600 hover:text-gray-900">
+
+          <nav className="flex-1  m-auto  sm:justify-center  gap-4">
+            <Link
+              href="/"
+              className="text-gray-600 hover:text-gray-900 flex justify-end"
+            >
               Home
             </Link>
-            {status === "authenticated" && session.user.role !== "admin" ? (
-              <Link
-                href="/dashboard/categories"
-                className=" text-gray-600 hover:text-gray-900"
-              >
-                Categories
-              </Link>
-            ) : (
-              false
-            )}
           </nav>
+          {status === "authenticated" && session?.user?.role !== "admin" && (
+            <Link
+              href="/dashboard/categories"
+              className="text-gray-600 hover:text-gray-900 m-auto"
+            >
+              Categories
+            </Link>
+          )}
         </div>
 
-        {/* --- الجزء الأيمن: البحث والمصادقة --- */}
-        <div className=" sm:flex items-center space-x-4 w-full md:mt-1">
-          <div className="flex-grow flex justify-center md:justify-between xl:flex-none">
+        {/* --- Right section: Search + Auth --- */}
+        <div className="flex flex-col  md:flex-row md:items-center gap-4 w-full md:w-auto">
+          {/* --- Search Input --- */}
+          <div className="w-full md:w-64 flex justify-center">
             <SearchInput />
           </div>
 
-          {/* --- تعديل: منطق عرض حالة المصادقة --- */}
+          {/* --- Auth Buttons or User Info --- */}
           {status === "loading" ? (
             <Skeleton className="h-9 w-24 rounded-md" />
           ) : status === "authenticated" ? (
-            <div className="mt-2 flex md:flex items-center space-x-3">
-              <span className="flex-2 text-sm text-gray-700">
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-sm text-gray-700 ">
                 Welcome, {session.user?.name?.split(" ")[0]}!
               </span>
               <Link href="/dashboard/posts">
@@ -64,7 +65,7 @@ export default function Navbar() {
               </Button>
             </div>
           ) : (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Link href="/login">
                 <Button variant="ghost" size="sm">
                   Sign In
