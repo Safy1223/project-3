@@ -26,7 +26,7 @@ export default function Navbar() {
               Home
             </Link>
           </nav>
-          {status === "authenticated" && session?.user?.role !== "admin" && (
+          {status === "authenticated" && session?.user?.role === "admin" && (
             <Link
               href="/dashboard/categories"
               className="text-gray-600 hover:text-gray-900 m-auto"
