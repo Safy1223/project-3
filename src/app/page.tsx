@@ -3,7 +3,7 @@ import Post from "@/models/Post";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Calendar, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, User } from "lucide-react";
 type PostType = {
   _id: string;
   title: string;
@@ -58,7 +58,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           No posts have been published yet.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div
+          dir="rtl"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8"
+        >
           {posts.map((post) => (
             <Card
               key={post._id.toString()}
@@ -98,7 +101,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   href={`/dashboard/postsSlug/${post.slug}`}
                   className="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center"
                 >
-                  Read More <ArrowRight className="ml-1 h-4 w-4" />
+                  Read More
+                  <ArrowLeft className="mr-1 h-4 w-4" />
                 </Link>
               </div>
             </Card>
