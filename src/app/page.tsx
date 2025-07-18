@@ -3,7 +3,7 @@ import Post from "@/models/Post";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Calendar, User } from "lucide-react";
+import { ArrowLeft, Calendar, User } from "lucide-react";
 type PostType = {
   _id: string;
   title: string;
