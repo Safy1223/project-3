@@ -73,12 +73,14 @@ const DashboardPostsPage = async ({ searchParams }: HomePageProps) => {
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div dir="rtl" className="space-y-6 ">
           {posts.map((post) => (
-            <Card key={post._id} className="shadow-sm">
-              <CardHeader className="flex flex-row items-start justify-between">
+            <Card key={post._id} className="shadow-sm ">
+              <CardHeader className="flex flex-col sm:flex-row items-start justify-between ">
                 <div className="flex-1">
-                  <CardTitle className="text-2xl">{post.title}</CardTitle>
+                  <CardTitle className="text-2xl flex flex-1  break-words">
+                    {post.title}
+                  </CardTitle>
                   <p className="text-sm text-gray-500 mt-1">
                     Created on:{" "}
                     {new Date(post.createdAt).toLocaleDateString("en-US", {
@@ -88,13 +90,9 @@ const DashboardPostsPage = async ({ searchParams }: HomePageProps) => {
                     })}
                   </p>
                 </div>
-                <div className="flex items-center space-x-2 ml-4">
+                <div className="flex-1/2 sm:flex-none   justify-end items-end space-x-2 space-y-2 ">
                   <Link href={`/dashboard/posts/${post._id}/edit`}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer "
-                    >
+                    <Button variant="outline" className="cursor-pointer ">
                       Edit
                     </Button>
                   </Link>
@@ -115,7 +113,9 @@ const DashboardPostsPage = async ({ searchParams }: HomePageProps) => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700">{post.content.slice(0, 100)}...</p>
+                <p dir="rtl" className="text-gray-700 ">
+                  {post.content.slice(0, 100)}...
+                </p>
               </CardContent>
             </Card>
           ))}
